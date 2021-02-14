@@ -43,12 +43,11 @@ class Trainer:
             loss.backward()
             self.optimizer.step()
 
+            # if i % (n_batches//5) == 0 and i != 0:
+                # print('Iteration {} ({}/{})\tLoss: {:.4f} Acc: {:4f}%'.format(
+                #     i, i, n_batches, losses/i, accs/(i*self.args.batch_size)*100.))
 
-            if i % (n_batches//5) == 0 and i != 0:
-                print('Iteration {} ({}/{})\tLoss: {:.4f} Acc: {:4f}%'.format(
-                    i, i, n_batches, losses/i, accs/(i*self.args.batch_size)*100.))
-
-        print('Train Epoch: {}\t>\tLoss: {:.4f} / Acc: {:.1f}%'.format(epoch, losses/n_batches, accs/n_samples*100.))
+        print('Train Epoch: {}\t>\tLoss: {:.4f} \t\t Acc: {:.1f}%'.format(epoch, losses/n_batches, accs/n_samples*100.))
             
     def validate(self, epoch):
         losses, accs = 0, 0
@@ -68,7 +67,7 @@ class Trainer:
                 acc = (outputs.argmax(dim=-1) == labels).sum()
                 accs += acc.item()
 
-        print('Valid Epoch: {}\t>\tLoss: {:.4f} / Acc: {:.1f}%'.format(epoch, losses/n_batches, accs/n_samples*100.))
+        print('Valid Epoch: {}\t>\tLoss: {:.4f} \t\t Acc: {:.1f}%'.format(epoch, losses/n_batches, accs/n_samples*100.))
 
     def save(self, epoch, model_prefix='model', root='.model'):
         path = Path(root) / (model_prefix + '.ep%d' % epoch)

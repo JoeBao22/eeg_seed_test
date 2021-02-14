@@ -41,7 +41,7 @@ def train_test_split(feature_arr, label_arr, cumulative_arr, train_percentage, g
     test_label = None
     for person_index in range(15):
         for day_index in range(3):
-            train_trial_num = int(train_percentage * 15)
+            train_trial_num = int(train_percentage * 15) 
             for trial_index in range(15):
                 start_index = cumulative_arr[(person_index * 3 + day_index) * 15 + trial_index]
                 end_index = cumulative_arr[(person_index * 3 + day_index) * 15 + trial_index + 1]

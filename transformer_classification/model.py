@@ -214,10 +214,8 @@ class TransformerEncoder(nn.Module):
         # src_mask = get_pad_mask(src_seq, self.src_pad_idx)
         src_mask = None
         outputs, *_ = self.encoder(src_seq, src_mask)
-
         outputs, _ = torch.max(outputs, dim=1)
         # |outputs| : (batch_size, d_model)
         outputs = self.softmax(self.linear(outputs))
         # |outputs| : (batch_size, 2)
-        
         return outputs
