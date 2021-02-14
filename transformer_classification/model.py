@@ -216,6 +216,4 @@ class TransformerEncoder(nn.Module):
         outputs, *_ = self.encoder(src_seq, src_mask)
         outputs, _ = torch.max(outputs, dim=1)
         # |outputs| : (batch_size, d_model)
-        outputs = self.softmax(self.linear(outputs))
-        # |outputs| : (batch_size, 2)
         return outputs
