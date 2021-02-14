@@ -31,6 +31,9 @@ if __name__ == '__main__':
     parser.add_argument('--train_percentage',  type=int, 
                         default=0.6,
                         help='portion of training samples for each subject')
+    parser.add_argument('--normalization',     type=bool,  
+                        default=True, 
+                        help='do normalization for train/test dataset by the rule learned from train dataset')
     parser.add_argument('--sample_per_input', type=int,
                         default=5, 
                         help='number of samples for each sample, or length of the sentence')

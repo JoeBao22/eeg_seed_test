@@ -3,6 +3,7 @@ import torch
 from torch.utils.data import TensorDataset
 import numpy as np
 import os
+from sklearn import preprocessing
 
 
 def create_examples(args,
@@ -13,7 +14,7 @@ def create_examples(args,
     labels += 1  # deal with offset (original labels: -1, 0, 1 => new labels: 0, 1, 2)
 
     train_arr, train_label, test_arr, test_label = train_test_split(
-        features, labels, cumulative, args.train_percentage, args.sample_per_input)
+        features, labels, cumulative, args.train_percentage, args.sample_per_input, args.normalization)
     
     train_tensor = torch.tensor(train_arr, dtype=torch.float)
     train_label = torch.tensor(train_label, dtype=torch.int64).squeeze_(1)
@@ -33,7 +34,7 @@ def load_mat(dirname):
     return feature_arr, label_arr, cumulative_arr
     
 
-def train_test_split(feature_arr, label_arr, cumulative_arr, train_percentage, group_by):
+def train_test_split(feature_arr, label_arr, cumulative_arr, train_percentage, group_by, normalization=False):
     seq_len = feature_arr.shape[1]
     train_feature = None
     train_label = None
@@ -64,4 +65,12 @@ def train_test_split(feature_arr, label_arr, cumulative_arr, train_percentage, g
                     else:
                         test_feature = np.vstack((test_feature, temp_arr))
                         test_label = np.vstack((test_label, temp_label))
+    vector_len = train_feature.shape[-1]
+    train_feature_2d = train_feature.reshape(-1, vector_len)
+    test_feature_2d = test_feature.reshape(-1, vector_len)
+    stdScale = preprocessing.StandardScaler().fit(train_feature_2d)
+    train_feature_2d = stdScale.transform(train_feature_2d)
+    test_feature_2d = stdScale.transform(test_feature_2d)
+    train_feature = train_feature_2d.reshape((-1, group_by, vector_len))
+    test_feature = test_feature_2d.reshape(-1, group_by, vector_len)
     return train_feature, train_label, test_feature, test_label
