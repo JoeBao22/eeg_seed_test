@@ -40,6 +40,9 @@ if __name__ == '__main__':
     parser.add_argument('--sample_len', type=int,
                         default=310, 
                         help='length of each sample')
+    parser.add_argument('--corrupt_num', type=int,
+                        default=31,
+                        help='random corrupted per sample')
     parser.add_argument('--output_model_prefix', type=str,
                         default='model_transformer',  
                         help='output model name prefix')

@@ -2,7 +2,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import random
 
+random.seed(0)
+torch.manual_seed(0)
 
 class ScaledDotProductAttention(nn.Module):
     ''' Scaled Dot-Product Attention '''
@@ -182,6 +185,22 @@ class Encoder(nn.Module):
             return enc_output, enc_slf_attn_list
         return enc_output,
 
+class CorruptionLayer(nn.Module):
+    def __init__(self, device, corrupt_num=10):
+        super(CorruptionLayer, self).__init__()
+        self.corrupt_num = corrupt_num
+        self.device = device
+    
+    def forward(self, feature):
+        batch_size, group_by, vector_len = feature.shape
+        for sample in range(batch_size):
+            for word_index in range(group_by):
+                chosen_index = random.sample(list(range(vector_len)), self.corrupt_num)
+                for num_index in chosen_index:
+                    # feature[sample][word_index][chosen_index] = torch.randn(1, device=self.device, requires_grad=True)
+                    feature[sample][word_index][chosen_index] = 0
+        return feature
+    
 
 class TransformerEncoder(nn.Module):
     """TransformerEncoder is a stack of N encoder layers.
@@ -213,7 +232,8 @@ class TransformerEncoder(nn.Module):
     def forward(self, src_seq):
         # src_mask = get_pad_mask(src_seq, self.src_pad_idx)
         src_mask = None
-        outputs, *_ = self.encoder(src_seq, src_mask)
-        outputs, _ = torch.max(outputs, dim=1)
+        outputs_feature, *_ = self.encoder(src_seq, src_mask)
+        outputs, _ = torch.max(outputs_feature, dim=1)
         # |outputs| : (batch_size, d_model)
-        return outputs
+        outputs_classification = self.softmax(self.linear(outputs))
+        return outputs_feature, outputs_classification
