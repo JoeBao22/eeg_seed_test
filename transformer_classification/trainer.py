@@ -17,14 +17,14 @@ class Trainer:
                                         n_heads     = args.n_attn_heads,
                                         p_drop      = args.dropout,
                                         d_ff        = args.ffn_hidden)
-        self.corruption = CorruptionLayer(self.device, args.corrupt_num)
+        self.corruption = CorruptionLayer(self.device, args.corrupt_probability)
         self.model.to(self.device)
         self.corruption.to(self.device)
 
         self.optimizer = optim.Adam(self.model.parameters(), args.lr)
         self.criterion_generation = nn.L1Loss()
         self.criterion_classification = nn.CrossEntropyLoss()
-        self.generation_scale = 1
+        self.generation_scale = 1e-2
 
     def train(self, epoch):
         losses, accs = 0, 0
@@ -48,7 +48,7 @@ class Trainer:
             acc = (outputs_classification.argmax(dim=-1) == labels).sum()
             accs += acc
             self.optimizer.zero_grad()
-            loss_generation.backward()
+            loss.backward()
             self.optimizer.step()
             # print(loss_classification.item())
         print('Train Epoch: {}'.format(epoch))

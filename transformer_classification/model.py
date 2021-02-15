@@ -186,20 +186,14 @@ class Encoder(nn.Module):
         return enc_output,
 
 class CorruptionLayer(nn.Module):
-    def __init__(self, device, corrupt_num=10):
+    def __init__(self, device, corrupt_probability=0.1):
         super(CorruptionLayer, self).__init__()
-        self.corrupt_num = corrupt_num
+        self.corrupt_p = corrupt_probability
         self.device = device
     
     def forward(self, feature):
-        batch_size, group_by, vector_len = feature.shape
-        for sample in range(batch_size):
-            for word_index in range(group_by):
-                chosen_index = random.sample(list(range(vector_len)), self.corrupt_num)
-                for num_index in chosen_index:
-                    # feature[sample][word_index][chosen_index] = torch.randn(1, device=self.device, requires_grad=True)
-                    feature[sample][word_index][chosen_index] = 0
-        return feature
+        bitmask = torch.cuda.FloatTensor(feature.shape).uniform_() > self.corrupt_p
+        return torch.mul(feature, bitmask)
     
 
 class TransformerEncoder(nn.Module):
