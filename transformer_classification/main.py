@@ -43,9 +43,9 @@ if __name__ == '__main__':
     parser.add_argument('--corrupt_probability', type=float,
                         default=0.05,
                         help='the probability that a cell is corrupted in the generation task')
-    parser.add_argument('--generation_scale', type=float,
+    parser.add_argument('--generation_weight', type=float,
                         default=0.1,
-                        help='a constant that determines the importance of generation task in the multi-task training. total cost = generation_cost * generation_scale + classification_cost * 1')
+                        help='a constant that determines the importance of generation task in the multi-task training. total cost = generation_cost * generation_weight + classification_cost * (1 - generation_weight)')
     parser.add_argument('--output_model_prefix', type=str,
                         default='model_transformer',  
                         help='output model name prefix')

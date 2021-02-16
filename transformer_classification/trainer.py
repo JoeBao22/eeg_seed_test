@@ -24,7 +24,7 @@ class Trainer:
         self.optimizer = optim.Adam(self.model.parameters(), args.lr)
         self.criterion_generation = nn.L1Loss()
         self.criterion_classification = nn.CrossEntropyLoss()
-        self.generation_scale = args.generation_scale
+        self.generation_weight = args.generation_weight
 
     def train(self, epoch):
         losses, accs = 0, 0
@@ -39,9 +39,9 @@ class Trainer:
             corrupted_inputs = self.corruption(inputs_copy)
             _, outputs_classification = self.model(inputs)
             outputs_feature_corrupted, _ = self.model(corrupted_inputs)
-            loss_generation = self.criterion_generation(outputs_feature_corrupted, inputs) * self.generation_scale
-            loss_classification = self.criterion_classification(outputs_classification, labels)
-            loss = loss_generation + loss_classification 
+            loss_generation = self.criterion_generation(outputs_feature_corrupted, inputs) * self.generation_weight 
+            loss_classification = self.criterion_classification(outputs_classification, labels) * (1 - self.generation_weight)
+            loss = loss_generation  + loss_classification 
             losses_generation += loss_generation
             losses_classification += loss_classification
             losses += loss.item()
@@ -68,8 +68,8 @@ class Trainer:
                 corrupted_inputs = self.corruption(inputs_copy)
                 _, outputs_classification = self.model(inputs)
                 outputs_feature_corrupted, _ = self.model(corrupted_inputs)
-                loss_generation = self.criterion_generation(outputs_feature_corrupted, inputs) * self.generation_scale
-                loss_classification = self.criterion_classification(outputs_classification, labels)
+                loss_generation = self.criterion_generation(outputs_feature_corrupted, inputs) * self.generation_weight 
+                loss_classification = self.criterion_classification(outputs_classification, labels) * (1 - self.generation_weight)
                 losses_classification += loss_classification
                 losses_generation += loss_generation
                 loss = loss_generation + loss_classification
