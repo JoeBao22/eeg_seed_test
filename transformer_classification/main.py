@@ -1,7 +1,7 @@
 import argparse
 from torch.utils.data import DataLoader
 
-from data_utils import create_examples
+from data_utils import create_examples, set_seeds
 from trainer import Trainer
 import os
 
@@ -10,7 +10,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def main(args):
     print(args)
-
+    set_seeds()
     # Build DataLoader
     train_dataset, test_dataset = create_examples(args)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)

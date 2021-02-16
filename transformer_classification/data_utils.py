@@ -4,7 +4,8 @@ from torch.utils.data import TensorDataset
 import numpy as np
 import os
 from sklearn import preprocessing
-
+import random
+    
 
 def create_examples(args,
                     mode: str = 'train') -> Iterable[Union[List, dict]]:
@@ -26,6 +27,11 @@ def create_examples(args,
 
     return train_dataset, test_dataset
 
+
+def set_seeds(seed=0):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+     
 
 def load_mat(dirname):
     feature_arr = np.load(os.path.join(dirname, "feature.npy"))

@@ -2,10 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import random
 
-random.seed(0)
-torch.manual_seed(0)
 
 class ScaledDotProductAttention(nn.Module):
     ''' Scaled Dot-Product Attention '''
