@@ -24,7 +24,7 @@ class Trainer:
         self.optimizer = optim.Adam(self.model.parameters(), args.lr)
         self.criterion_generation = nn.L1Loss()
         self.criterion_classification = nn.CrossEntropyLoss()
-        self.generation_scale = 1e-2
+        self.generation_scale = args.generation_scale
 
     def train(self, epoch):
         losses, accs = 0, 0
