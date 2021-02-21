@@ -22,10 +22,31 @@ class Trainer:
         self.corruption.to(self.device)
 
         self.optimizer = optim.Adam(self.model.parameters(), args.lr)
-        self.criterion_generation = nn.L1Loss()
+        self.criterion_generation = nn.MSELoss()
         self.criterion_classification = nn.CrossEntropyLoss()
         self.generation_weight = args.generation_weight
 
+    def pretrain(self, epoch):
+        # generation task only
+        losses = 0
+        n_batches, n_samples = len(self.train_loader), len(self.train_loader.dataset)
+        
+        self.model.train()
+        for i, batch in enumerate(self.train_loader):
+            inputs, labels = map(lambda x: x.to(self.device), batch)
+            inputs_copy = inputs.clone()
+            corrupted_inputs = self.corruption(inputs_copy)
+            outputs_feature_corrupted, _ = self.model(corrupted_inputs)
+            loss = self.criterion_generation(outputs_feature_corrupted, inputs) 
+            losses += loss.item()
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
+            # print(loss_classification.item())
+        print('Pretrain Epoch: {}'.format(epoch))
+        print('Generation:\tLoss: {:.4f}'.format(losses/n_batches))
+        
+        
     def train(self, epoch):
         losses, accs = 0, 0
         losses_generation = 0

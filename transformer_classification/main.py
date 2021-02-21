@@ -5,7 +5,7 @@ from data_utils import create_examples, set_seeds
 from trainer import Trainer
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
 def main(args):
@@ -17,6 +17,10 @@ def main(args):
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
     # Build Trainer
     trainer = Trainer(args, train_loader, test_loader)
+    # Warm up
+    for epoch in range(1, args.pretrain + 1):
+        trainer.pretrain(epoch)
+        
     # Train & Validate
     for epoch in range(1, args.epochs+1):
         trainer.train(epoch)
@@ -52,6 +56,7 @@ if __name__ == '__main__':
     # Input parameters
     parser.add_argument('--batch_size',     default=32,   type=int,   help='batch size')
     # Train parameters
+    parser.add_argument('--pretrain',         default=0,   type=int,   help='pretrain epochs, generation task only')
     parser.add_argument('--epochs',         default=50,   type=int,   help='the number of epochs')
     parser.add_argument('--lr',             default=1e-6, type=float, help='learning rate')
     parser.add_argument('--no_cuda',        action='store_true')
